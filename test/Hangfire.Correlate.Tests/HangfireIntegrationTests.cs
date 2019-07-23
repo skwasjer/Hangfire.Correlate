@@ -5,13 +5,11 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Correlate;
-using Correlate.DependencyInjection;
 using Correlate.Http;
 using FluentAssertions;
-using Hangfire.Correlate.Extensions;
+using Hangfire.Server;
 using Hangfire.Storage;
 using Hangfire.Storage.Monitoring;
-using Microsoft.Extensions.DependencyInjection;
 using MockHttp;
 using Xunit;
 using Xunit.Abstractions;
@@ -19,58 +17,52 @@ using CorrelationManager = Correlate.CorrelationManager;
 
 namespace Hangfire.Correlate
 {
-	public abstract class HangfireIntegrationTests : IDisposable
+	public abstract class HangfireIntegrationTests : IAsyncLifetime
 	{
 		private readonly ITestOutputHelper _testOutputHelper;
-		private readonly ServiceProvider _services;
-		private readonly JobStorage _jobStorage;
-		private readonly IBackgroundJobClient _client;
 		private readonly CorrelationManager _correlationManager;
-		private readonly ICollection<object> _executedJobs;
-		private readonly MockHttpHandler _mockHttp;
 
-		protected HangfireIntegrationTests(ITestOutputHelper testOutputHelper, Action<IServiceCollection> configureServices)
+		private IBackgroundProcessingServer _server;
+		private IBackgroundJobClient _client;
+
+		protected HangfireIntegrationTests(ITestOutputHelper testOutputHelper)
 		{
-			_testOutputHelper = testOutputHelper;
-			_executedJobs = new List<object>();
+			// Output type + timestamp
+			_testOutputHelper = testOutputHelper ?? throw new ArgumentNullException(nameof(testOutputHelper));
+			_testOutputHelper.WriteLine(GetType().Name + "," + DateTime.Now.Ticks);
 
-			_mockHttp = new MockHttpHandler();
-			_mockHttp.Fallback.Respond(HttpStatusCode.OK);
+			MockHttp.Fallback.Respond(HttpStatusCode.OK);
 
-			// Register Correlate. The provided action should register Hangfire and tell Hangfire to use Correlate.
-			IServiceCollection serviceCollection = new ServiceCollection()
-				.AddCorrelate();
-			configureServices(serviceCollection);
-
-			// Below, dependencies for test only.
-
-			// Register a typed client which is used by the job to call an endpoint.
-			// We use it to assert the request header contains the correlation id.
-			serviceCollection
-				.AddHttpClient<TestService>(client =>
-				{
-					client.BaseAddress = new Uri("http://0.0.0.0");
-				})
-				.ConfigurePrimaryHttpMessageHandler(() => _mockHttp)
-				.CorrelateRequests();
-
-			serviceCollection
-				.AddSingleton<BackgroundJobServer>()
-				.AddSingleton(_executedJobs)
-				.AddSingleton(testOutputHelper)
-				.ForceEnableLogging();
-
-			_services = serviceCollection.BuildServiceProvider();
-
-			_jobStorage = _services.GetRequiredService<JobStorage>();
-			_client = _services.GetRequiredService<IBackgroundJobClient>();
-			_correlationManager = _services.GetRequiredService<CorrelationManager>();
+			var correlationContextAccessor = new CorrelationContextAccessor();
+			_correlationManager = new CorrelationManager(
+				new CorrelationContextFactory(correlationContextAccessor),
+				new GuidCorrelationIdFactory(),
+				correlationContextAccessor,
+				new TestLogger<CorrelationManager>()
+			);
 		}
 
-		public void Dispose()
+		public virtual Task InitializeAsync()
 		{
-			_services.Dispose();
+			// We create server so that we can test that jobs are executed properly.
+			_server = CreateServer();
+			// We create client to enqueue new jobs.
+			_client = CreateClient();
+			return Task.CompletedTask;
 		}
+
+		public virtual Task DisposeAsync()
+		{
+			_server.Dispose();
+			MockHttp.Dispose();
+			return Task.CompletedTask;
+		}
+
+		protected MockHttpHandler MockHttp { get; } = new MockHttpHandler();
+		protected ICollection<object> ExecutedJobs { get; } = new List<object>();
+
+		protected abstract IBackgroundProcessingServer CreateServer();
+		protected abstract IBackgroundJobClient CreateClient();
 
 		[Fact]
 		public async Task Given_job_is_queued_outside_correlationContext_should_use_jobId_as_correlationId()
@@ -87,7 +79,7 @@ namespace Hangfire.Correlate
 			await WaitUntilJobCompletedAsync(jobId);
 
 			// Assert
-			_executedJobs.Should().BeEquivalentTo(
+			ExecutedJobs.Should().BeEquivalentTo(
 				new List<object> { expectedJob }, 
 				"no correlation context exists, so the job id should be used when performing the job"
 			);
@@ -114,7 +106,7 @@ namespace Hangfire.Correlate
 			await WaitUntilJobCompletedAsync(expectedJob.JobId);
 
 			// Assert
-			_executedJobs.Should().BeEquivalentTo(
+			ExecutedJobs.Should().BeEquivalentTo(
 				new List<object> { expectedJob },
 				"a correlation context exists, so the correlation id should be used when performing the job"
 			);
@@ -125,7 +117,7 @@ namespace Hangfire.Correlate
 		{
 			string jobId = _client.Enqueue<BackgroundTestExecutor>(job => job.RunAsync(250, null));
 
-			_mockHttp
+			MockHttp
 				.When(matching => matching.Header(CorrelationHttpHeaders.CorrelationId, jobId))
 				.Callback(r => _testOutputHelper.WriteLine("Request sent with correlation id: {0}", jobId))
 				.Respond(HttpStatusCode.OK)
@@ -135,7 +127,7 @@ namespace Hangfire.Correlate
 			await WaitUntilJobCompletedAsync(jobId);
 
 			// Assert
-			_mockHttp.Verify();
+			MockHttp.Verify();
 		}
 
 		[Fact]
@@ -144,7 +136,7 @@ namespace Hangfire.Correlate
 			const string correlationId = "my-id";
 			string jobId = null;
 
-			_mockHttp
+			MockHttp
 				.When(matching => matching.Header(CorrelationHttpHeaders.CorrelationId, correlationId))
 				.Callback(r => _testOutputHelper.WriteLine("Request sent with correlation id: {0}", correlationId))
 				.Respond(HttpStatusCode.OK)
@@ -161,17 +153,14 @@ namespace Hangfire.Correlate
 			await WaitUntilJobCompletedAsync(jobId);
 
 			// Assert
-			_mockHttp.Verify();
+			MockHttp.Verify();
 		}
 
 		private async Task WaitUntilJobCompletedAsync(string jobId, int maxWaitInMilliseconds = 5000)
 		{
-			// Request the server to initialize it and to start processing.
-			_services.GetRequiredService<BackgroundJobServer>();
+			IMonitoringApi monitoringApi = JobStorage.Current.GetMonitoringApi();
 
-			IMonitoringApi monitoringApi = _jobStorage.GetMonitoringApi();
-
-			Stopwatch sw = Stopwatch.StartNew();
+			var sw = Stopwatch.StartNew();
 			JobDetailsDto jobDetails = null;
 			while ((jobDetails == null || jobDetails.History.All(s => s.StateName != "Succeeded")) && (sw.Elapsed.TotalMilliseconds < maxWaitInMilliseconds || Debugger.IsAttached))
 			{

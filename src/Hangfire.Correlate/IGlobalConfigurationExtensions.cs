@@ -31,7 +31,7 @@ namespace Hangfire.Correlate
 			{
 				return configuration.UseFilter(ActivatorUtilities.CreateInstance<CorrelateFilterAttribute>(serviceProvider));
 			}
-			catch (SystemException ex)
+			catch (InvalidOperationException ex)
 			{
 				throw new InvalidOperationException("Failed to register Correlate with Hangfire. Please ensure `.AddCorrelate()` is called on the service collection.", ex);
 			}
