@@ -117,6 +117,8 @@ public class MyService
 }
 ```
 
+> Note: when using Correlate integration for ASP.NET Core, each request is already scoped to a correlation context, and so there is no need to wrap the enqueueing of jobs with `IAsyncCorrelationManager`/`ICorrelationManager`.
+
 ## More info
 
 See [Correlate](https://github.com/skwasjer/Correlate) documentation for further integration with ASP.NET Core, `IHttpClientFactory` and for other extensions/libraries.
