@@ -8,7 +8,7 @@
   <Import Project="..\Package.props" />
 
   <PropertyGroup>
-    <Description></Description>
+    <Description>Hangfire integration of Correlate to add correlation id support to Hangfire background/scheduled jobs.</Description>
     <PackageProjectUrl>https://github.com/skwasjer/Hangfire.Correlate</PackageProjectUrl>
     <PackageTags>hangfire, correlationid, correlation, correlate, causation</PackageTags>
   </PropertyGroup>
