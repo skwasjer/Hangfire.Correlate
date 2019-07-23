@@ -24,6 +24,7 @@ namespace Hangfire.Correlate
 
 		private IBackgroundProcessingServer _server;
 		private IBackgroundJobClient _client;
+		private const int TimeoutInMillis = 50;
 
 		protected HangfireIntegrationTests(ITestOutputHelper testOutputHelper)
 		{
@@ -67,7 +68,7 @@ namespace Hangfire.Correlate
 		[Fact]
 		public async Task Given_job_is_queued_outside_correlationContext_should_use_jobId_as_correlationId()
 		{
-			string jobId = _client.Enqueue<BackgroundTestExecutor>(job => job.RunAsync(250, null));
+			string jobId = _client.Enqueue<BackgroundTestExecutor>(job => job.RunAsync(TimeoutInMillis, null));
 			var expectedJob = new BackgroundTestExecutor
 			{
 				JobId = jobId,
@@ -100,7 +101,7 @@ namespace Hangfire.Correlate
 				async () =>
 				{
 					await Task.Yield();
-					expectedJob.JobId = _client.Enqueue<BackgroundTestExecutor>(job => job.RunAsync(250, null));
+					expectedJob.JobId = _client.Enqueue<BackgroundTestExecutor>(job => job.RunAsync(TimeoutInMillis, null));
 				});
 
 			await WaitUntilJobCompletedAsync(expectedJob.JobId);
@@ -115,7 +116,7 @@ namespace Hangfire.Correlate
 		[Fact]
 		public async Task Given_job_is_queued_outside_correlationContext_should_put_correlationId_in_http_header()
 		{
-			string jobId = _client.Enqueue<BackgroundTestExecutor>(job => job.RunAsync(250, null));
+			string jobId = _client.Enqueue<BackgroundTestExecutor>(job => job.RunAsync(TimeoutInMillis, null));
 
 			MockHttp
 				.When(matching => matching.Header(CorrelationHttpHeaders.CorrelationId, jobId))
@@ -147,13 +148,100 @@ namespace Hangfire.Correlate
 				async () =>
 				{
 					await Task.Yield();
-					jobId = _client.Enqueue<BackgroundTestExecutor>(job => job.RunAsync(250, null));
+					jobId = _client.Enqueue<BackgroundTestExecutor>(job => job.RunAsync(TimeoutInMillis, null));
 				});
 
 			await WaitUntilJobCompletedAsync(jobId);
 
 			// Assert
 			MockHttp.Verify();
+		}
+
+		[Fact]
+		public async Task Given_parent_job_is_queued_when_queueing_continuation_outside_of_correlation_context_should_use_same_correlation_id_as_parent()
+		{
+			const string correlationId = "my-id";
+			var expectedParentJob = new BackgroundTestExecutor
+			{
+				CorrelationId = correlationId,
+				JobHasCompleted = true
+			};
+			var expectedContinuationJob = new BackgroundTestExecutor
+			{
+				CorrelationId = correlationId,
+				JobHasCompleted = true
+			};
+
+			// Queue parent
+			_correlationManager.Correlate(correlationId, () =>
+			{
+				expectedParentJob.JobId = _client.Enqueue<BackgroundTestExecutor>(
+					job => job.RunAsync(TimeoutInMillis, null)
+				);
+			});
+
+			// Act
+			// We queue on purpose outside of context, so we are able to test if the job inherits the correlation id from parent job.
+			expectedContinuationJob.JobId = _client.ContinueJobWith<BackgroundTestExecutor>(
+				expectedParentJob.JobId,
+				job => job.RunAsync(TimeoutInMillis, null)
+			);
+
+			await WaitUntilJobCompletedAsync(expectedContinuationJob.JobId);
+
+			// Assert
+			ExecutedJobs.Should().BeEquivalentTo(
+				new List<object>
+				{
+					expectedParentJob,
+					expectedContinuationJob
+				},
+				"the continuation job should have the same correlation id"
+			);
+		}
+
+		[Fact]
+		public async Task Given_parent_job_is_queued_when_queueing_continuation_inside_of_correlation_context_should_use_correlation_id_from_context()
+		{
+			var expectedParentJob = new BackgroundTestExecutor
+			{
+				CorrelationId = "parent-id",
+				JobHasCompleted = true
+			};
+			var expectedContinuationJob = new BackgroundTestExecutor
+			{
+				CorrelationId = "continuation-id",
+				JobHasCompleted = true
+			};
+
+			// Queue parent
+			_correlationManager.Correlate(expectedParentJob.CorrelationId, () =>
+			{
+				expectedParentJob.JobId = _client.Enqueue<BackgroundTestExecutor>(
+					job => job.RunAsync(TimeoutInMillis, null)
+				);
+			});
+
+			// Act
+			_correlationManager.Correlate(expectedContinuationJob.CorrelationId, () =>
+			{
+				expectedContinuationJob.JobId = _client.ContinueJobWith<BackgroundTestExecutor>(
+					expectedParentJob.JobId,
+					job => job.RunAsync(TimeoutInMillis, null)
+				);
+			});
+
+			await WaitUntilJobCompletedAsync(expectedContinuationJob.JobId);
+
+			// Assert
+			ExecutedJobs.Should().BeEquivalentTo(
+				new List<object>
+				{
+					expectedParentJob,
+					expectedContinuationJob
+				},
+				"the continuation job should have the same correlation id"
+			);
 		}
 
 		private async Task WaitUntilJobCompletedAsync(string jobId, int maxWaitInMilliseconds = 5000)

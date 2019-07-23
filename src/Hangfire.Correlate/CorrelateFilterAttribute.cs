@@ -3,6 +3,8 @@ using Correlate;
 using Hangfire.Client;
 using Hangfire.Common;
 using Hangfire.Server;
+using Hangfire.States;
+using Hangfire.Storage;
 
 namespace Hangfire.Correlate
 {
@@ -24,10 +26,33 @@ namespace Hangfire.Correlate
 		{
 			// Assign correlation id to job if job is started in correlation context.
 			string correlationId = _correlationContextAccessor.CorrelationContext?.CorrelationId;
-			if (!string.IsNullOrWhiteSpace(correlationId))
+			if (string.IsNullOrEmpty(correlationId))
+			{
+				correlationId = GetContinuationCorrelationId(filterContext);
+			}
+
+			if (!string.IsNullOrEmpty(correlationId))
 			{
 				filterContext.SetJobParameter(CorrelationIdKey, correlationId);
 			}
+		}
+
+		/// <summary>
+		/// When this is a continuation job, use the correlation id from the parent.
+		/// </summary>
+		private static string GetContinuationCorrelationId(CreateContext filterContext)
+		{
+			if (!(filterContext.InitialState is AwaitingState awaitingState))
+			{
+				return null;
+			}
+
+			IStorageConnection conn = filterContext.Storage.GetConnection();
+			string parentCorrelationId = SerializationHelper.Deserialize<string>(conn.GetJobParameter(awaitingState.ParentId, CorrelationIdKey));
+
+			return !string.IsNullOrEmpty(parentCorrelationId)
+				? parentCorrelationId
+				: null;
 		}
 
 		public void OnCreated(CreatedContext filterContext)
