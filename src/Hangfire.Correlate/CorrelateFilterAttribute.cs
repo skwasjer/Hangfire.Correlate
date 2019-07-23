@@ -52,7 +52,7 @@ namespace Hangfire.Correlate
 
 			return !string.IsNullOrEmpty(parentCorrelationId)
 				? parentCorrelationId
-				: null;
+				: awaitingState.ParentId;
 		}
 
 		public void OnCreated(CreatedContext filterContext)

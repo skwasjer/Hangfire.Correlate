@@ -244,6 +244,42 @@ namespace Hangfire.Correlate
 			);
 		}
 
+		[Fact]
+		public async Task Given_parent_job_is_queued_outside_correlation_context_when_queueing_continuation_also_outside_context_should_use_job_id_from_parent()
+		{
+			var expectedParentJob = new BackgroundTestExecutor
+			{
+				JobHasCompleted = true
+			};
+			var expectedContinuationJob = new BackgroundTestExecutor
+			{
+				JobHasCompleted = true
+			};
+
+			// Queue parent
+			expectedParentJob.JobId = expectedParentJob.CorrelationId = expectedContinuationJob.CorrelationId = _client.Enqueue<BackgroundTestExecutor>(
+				job => job.RunAsync(TimeoutInMillis, null)
+			);
+
+			// Act
+			expectedContinuationJob.JobId = _client.ContinueJobWith<BackgroundTestExecutor>(
+				expectedParentJob.JobId,
+				job => job.RunAsync(TimeoutInMillis, null)
+			);
+
+			await WaitUntilJobCompletedAsync(expectedContinuationJob.JobId);
+
+			// Assert
+			ExecutedJobs.Should().BeEquivalentTo(
+				new List<object>
+				{
+					expectedParentJob,
+					expectedContinuationJob
+				},
+				"the parent id has no correlation id but the continuation job should have the parent job id for correlation id"
+			);
+		}
+
 		private async Task WaitUntilJobCompletedAsync(string jobId, int maxWaitInMilliseconds = 5000)
 		{
 			IMonitoringApi monitoringApi = JobStorage.Current.GetMonitoringApi();
