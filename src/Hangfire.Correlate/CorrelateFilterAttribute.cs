@@ -47,8 +47,7 @@ namespace Hangfire.Correlate
 				return null;
 			}
 
-			IStorageConnection conn = filterContext.Storage.GetConnection();
-			string parentCorrelationId = SerializationHelper.Deserialize<string>(conn.GetJobParameter(awaitingState.ParentId, CorrelationIdKey));
+			string parentCorrelationId = SerializationHelper.Deserialize<string>(filterContext.Connection.GetJobParameter(awaitingState.ParentId, CorrelationIdKey));
 
 			return !string.IsNullOrEmpty(parentCorrelationId)
 				? parentCorrelationId
