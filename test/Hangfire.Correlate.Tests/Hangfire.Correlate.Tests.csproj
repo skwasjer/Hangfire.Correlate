@@ -9,7 +9,7 @@
   <ItemGroup>
     <PackageReference Include="Correlate.DependencyInjection" Version="4.0.0" />
     <PackageReference Include="Hangfire.MemoryStorage" Version="1.7.0" />
-    <PackageReference Include="skwas.MockHttp" Version="2.2.0" />
+    <PackageReference Include="skwas.MockHttp" Version="3.1.0-rc0001" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'=='net6.0'">

@@ -29,7 +29,7 @@ public abstract class HangfireIntegrationTests : GlobalTestContext
         _testOutputHelper = testOutputHelper ?? throw new ArgumentNullException(nameof(testOutputHelper));
         _testOutputHelper.WriteLine(GetType().Name + "," + DateTime.Now.Ticks);
 
-        MockHttp.Fallback.Respond(HttpStatusCode.OK);
+        MockHttp.Fallback.Respond(with => with.StatusCode(HttpStatusCode.OK));
 
         var correlationContextAccessor = new CorrelationContextAccessor();
         _correlationManager = new CorrelationManager(
@@ -105,7 +105,7 @@ public abstract class HangfireIntegrationTests : GlobalTestContext
         MockHttp
             .When(matching => matching.Header(CorrelationHttpHeaders.CorrelationId, correlationId))
             .Callback(_ => _testOutputHelper.WriteLine("Request sent with correlation id: {0}", correlationId))
-            .Respond(HttpStatusCode.OK)
+            .Respond(with => with.StatusCode(HttpStatusCode.OK))
             .Verifiable();
 
         // Act
@@ -161,7 +161,7 @@ public abstract class HangfireIntegrationTests : GlobalTestContext
         MockHttp
             .When(matching => matching.Header(CorrelationHttpHeaders.CorrelationId, jobId))
             .Callback(_ => _testOutputHelper.WriteLine("Request sent with correlation id: {0}", jobId))
-            .Respond(HttpStatusCode.OK)
+            .Respond(with => with.StatusCode(HttpStatusCode.OK))
             .Verifiable();
 
         // Act
