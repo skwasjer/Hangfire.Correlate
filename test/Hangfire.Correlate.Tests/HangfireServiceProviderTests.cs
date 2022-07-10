@@ -1,17 +1,14 @@
-﻿
-#if NETCOREAPP1_1
-using System.Net.Http;
-using Correlate;
-using Correlate.Http;
-using Microsoft.Extensions.Options;
-#endif
-#if NETCOREAPP
+﻿#if NETCOREAPP
 using System;
+using System.Net.Http;
 using System.Threading.Tasks;
+using Correlate;
 using Correlate.DependencyInjection;
+using Correlate.Http;
 using Hangfire.MemoryStorage;
 using Hangfire.Server;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -43,7 +40,7 @@ namespace Hangfire.Correlate
 
 			// Below, dependencies for test only.
 
-#if NETCOREAPP2_2
+#if NETCOREAPP3_1_OR_GREATER
 			// Register a typed client which is used by the job to call an endpoint.
 			// We use it to assert the request header contains the correlation id.
 			serviceCollection

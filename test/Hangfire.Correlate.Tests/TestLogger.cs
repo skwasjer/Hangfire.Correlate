@@ -1,6 +1,6 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions.Internal;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Hangfire.Correlate
 {
@@ -32,7 +32,11 @@ namespace Hangfire.Correlate
 
 		public IDisposable BeginScope<TState>(TState state)
 		{
-			return NullScope.Instance;
+#if NETCOREAPP3_1_OR_GREATER
+			return NullLogger.Instance.BeginScope(state);
+#else
+			return Microsoft.Extensions.Logging.Abstractions.Internal.NullScope.Instance;
+#endif
 		}
 	}
 }

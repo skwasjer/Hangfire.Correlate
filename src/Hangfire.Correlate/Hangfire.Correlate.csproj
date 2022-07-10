@@ -1,11 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netstandard1.3;net46</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netstandard1.3;net462</TargetFrameworks>
     <IsTestProject>false</IsTestProject>
   </PropertyGroup>
-
-  <Import Project="..\Package.props" />
 
   <PropertyGroup>
     <Description>Hangfire integration of Correlate to add correlation id support to Hangfire background/scheduled jobs.</Description>

@@ -1,40 +1,39 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.2;netcoreapp1.1;net46</TargetFrameworks>
+    <TargetFrameworks>net6.0;netcoreapp3.1;net48;net462</TargetFrameworks>
     <IsTestProject>true</IsTestProject>
-    <IsPackable>false</IsPackable>
     <RootNamespace>Hangfire.Correlate</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Correlate.DependencyInjection" Version="3.2.0" />
-    <PackageReference Include="FluentAssertions" Version="5.10.0" />
     <PackageReference Include="Hangfire" Version="1.7.8" />
     <PackageReference Include="Hangfire.MemoryStorage" Version="1.6.1" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
-    <PackageReference Include="Moq" Version="4.10.1" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="skwas.MockHttp" Version="2.2.0" />
-    <PackageReference Include="xunit" Version="2.4.1" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-    </PackageReference>
   </ItemGroup>
 
-  <ItemGroup Condition="$(TargetFramework.StartsWith('netcoreapp2'))">
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="2.2.0" />
+  <ItemGroup Condition="'$(TargetFramework)'=='net6.0'">
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
   </ItemGroup>
 
-  <ItemGroup Condition="$(TargetFramework.StartsWith('netcoreapp1')) Or $(TargetFramework.StartsWith('net4'))">
+  <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp3.1'">
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.26" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.26" />
+  </ItemGroup>
+
+  <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="1.1.1" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="1.1.2" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Hangfire.Correlate\Hangfire.Correlate.csproj" />
+    <ProjectReference Include="..\..\src\Hangfire.Correlate\Hangfire.Correlate.csproj" AdditionalProperties="TargetFramework=netstandard2.0" Condition="'$(TargetFramework)'=='net6.0'" />
+    <ProjectReference Include="..\..\src\Hangfire.Correlate\Hangfire.Correlate.csproj" AdditionalProperties="TargetFramework=netstandard2.0" Condition="'$(TargetFramework)'=='netcoreapp3.1'" />
+    <ProjectReference Include="..\..\src\Hangfire.Correlate\Hangfire.Correlate.csproj" AdditionalProperties="TargetFramework=netstandard1.3" Condition="'$(TargetFramework)'=='net48'" />
+    <ProjectReference Include="..\..\src\Hangfire.Correlate\Hangfire.Correlate.csproj" AdditionalProperties="TargetFramework=net462" Condition="'$(TargetFramework)'=='net462'" />
   </ItemGroup>
 
 </Project>
