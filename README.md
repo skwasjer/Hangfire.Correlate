@@ -12,8 +12,8 @@ dotnet add package Hangfire.Correlate
 
 ---
 
-[![Build status](https://ci.appveyor.com/api/projects/status/k0ihl8phwimr3w89/branch/master?svg=true)](https://ci.appveyor.com/project/skwasjer/hangfire-correlate)
-[![Tests](https://img.shields.io/appveyor/tests/skwasjer/hangfire-correlate/master.svg)](https://ci.appveyor.com/project/skwasjer/hangfire-correlate/build/tests)
+[![Build status](https://ci.appveyor.com/api/projects/status/k0ihl8phwimr3w89/branch/main?svg=true)](https://ci.appveyor.com/project/skwasjer/hangfire-correlate)
+[![Tests](https://img.shields.io/appveyor/tests/skwasjer/hangfire-correlate/main.svg)](https://ci.appveyor.com/project/skwasjer/hangfire-correlate/build/tests)
 
 | | | |
 |---|---|---|
@@ -125,13 +125,11 @@ See [Correlate](https://github.com/skwasjer/Correlate) documentation for further
 
 ### Supported .NET targets
 - .NET Standard 2.0
-- .NET Standard 1.3
-- .NET Framework 4.6
 
 ### Build requirements
-- Visual Studio 2017
-- .NET Core 2.2/2.1 SDK
-- .NET 4.6 targetting pack
+- Visual Studio 2022
+- .NET 6.0
+- .NET Core 3.1
 
 #### Contributions
 PR's are welcome. Please rebase before submitting, provide test coverage, and ensure the AppVeyor build passes. I will not consider PR's otherwise.
