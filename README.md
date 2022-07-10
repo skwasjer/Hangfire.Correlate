@@ -14,6 +14,7 @@ dotnet add package Hangfire.Correlate
 
 [![Build status](https://ci.appveyor.com/api/projects/status/k0ihl8phwimr3w89/branch/main?svg=true)](https://ci.appveyor.com/project/skwasjer/hangfire-correlate)
 [![Tests](https://img.shields.io/appveyor/tests/skwasjer/hangfire-correlate/main.svg)](https://ci.appveyor.com/project/skwasjer/hangfire-correlate/build/tests)
+[![codecov](https://codecov.io/gh/skwasjer/Hangfire.Correlate/branch/main/graph/badge.svg?token=ISJGcC6Kqv)](https://codecov.io/gh/skwasjer/Hangfire.Correlate)
 
 | | | |
 |---|---|---|
