@@ -12,17 +12,16 @@ root = true
 [*]
 indent_style = space
 indent_size = 4
-insert_final_newline = false
+insert_final_newline = true
 
-[*.{cs,tt}]
+[*.{cs,csproj,tt}]
 charset = utf-8-bom
 end_of_line = crlf
-indent_style = tab
+indent_style = space
 
-[*.{csproj,props}]
-charset = utf-8-bom
-end_of_line = crlf
+[*.{csproj,props,targets}]
 indent_size = 2
+indent_style = space
 
 # Misc
 [*.{js,json,yml}]
@@ -76,6 +75,8 @@ dotnet_style_prefer_inferred_anonymous_type_member_names = true:suggestion
 dotnet_style_prefer_auto_properties = true:silent
 dotnet_style_prefer_conditional_expression_over_assignment = true:silent
 dotnet_style_prefer_conditional_expression_over_return = true:silent
+csharp_style_prefer_index_operator = false:suggestion
+csharp_style_prefer_range_operator = false:suggestion
 
 ###############################
 # Naming Conventions          #
@@ -84,13 +85,33 @@ dotnet_style_prefer_conditional_expression_over_return = true:silent
 # Style Definitions
 dotnet_naming_style.pascal_case_style.capitalization = pascal_case
 
-# Use PascalCase for constant fields
+dotnet_naming_style.underscore_lower_camel_case_style.capitalization = camel_case
+dotnet_naming_style.underscore_lower_camel_case_style.required_prefix = _
+
+# Private fields
+dotnet_naming_rule.fields_should_be_underscore_lower_camel_case.severity = suggestion
+dotnet_naming_rule.fields_should_be_underscore_lower_camel_case.symbols  = private_fields
+dotnet_naming_rule.fields_should_be_underscore_lower_camel_case.style    = underscore_lower_camel_case_style
+dotnet_naming_symbols.private_fields.applicable_kinds            = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities  = private
+
+# Constants
 dotnet_naming_rule.constant_fields_should_be_pascal_case.severity = suggestion
 dotnet_naming_rule.constant_fields_should_be_pascal_case.symbols  = constant_fields
 dotnet_naming_rule.constant_fields_should_be_pascal_case.style    = pascal_case_style
+
 dotnet_naming_symbols.constant_fields.applicable_kinds            = field
 dotnet_naming_symbols.constant_fields.applicable_accessibilities  = *
 dotnet_naming_symbols.constant_fields.required_modifiers          = const
+
+# Static readonly
+dotnet_naming_rule.static_readonly_fields_should_be_pascal_case.severity = suggestion
+dotnet_naming_rule.static_readonly_fields_should_be_pascal_case.symbols  = static_readonly_fields
+dotnet_naming_rule.static_readonly_fields_should_be_pascal_case.style    = pascal_case_style
+
+dotnet_naming_symbols.static_readonly_fields.applicable_kinds            = field
+dotnet_naming_symbols.static_readonly_fields.applicable_accessibilities  = *
+dotnet_naming_symbols.static_readonly_fields.required_modifiers          = static,readonly
 
 ###############################
 # C# Code Style Rules         #
@@ -127,6 +148,9 @@ csharp_style_deconstructed_variable_declaration = true:suggestion
 csharp_prefer_simple_default_expression = true:suggestion
 csharp_style_pattern_local_over_anonymous_function = true:suggestion
 csharp_style_inlined_variable_declaration = true:suggestion
+
+# File scoped ns
+csharp_style_namespace_declarations = file_scoped:error
 
 ###############################
 # C# Formatting Rules         #

@@ -1,20 +1,16 @@
-﻿using System.Net.Http;
-using System.Threading.Tasks;
+﻿namespace Hangfire.Correlate;
 
-namespace Hangfire.Correlate
+public class TestService
 {
-	public class TestService
-	{
-		private readonly HttpClient _client;
+    private readonly HttpClient _client;
 
-		public TestService(HttpClient client)
-		{
-			_client = client;
-		}
+    public TestService(HttpClient client)
+    {
+        _client = client;
+    }
 
-		public Task<string> CallApi()
-		{
-			return _client.GetStringAsync("");
-		}
-	}
+    public Task<string> CallApi()
+    {
+        return _client.GetStringAsync("");
+    }
 }
