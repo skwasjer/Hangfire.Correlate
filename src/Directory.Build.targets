@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <WarningsAsErrors>NU1605;CS1591</WarningsAsErrors>
   </PropertyGroup>
 
   <PropertyGroup>
