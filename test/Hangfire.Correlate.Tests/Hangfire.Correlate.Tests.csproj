@@ -1,15 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net6.0;netcoreapp3.1;net48;net462</TargetFrameworks>
+    <TargetFrameworks>net6.0;netcoreapp3.1</TargetFrameworks>
     <IsTestProject>true</IsTestProject>
     <RootNamespace>Hangfire.Correlate</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Correlate.DependencyInjection" Version="3.2.0" />
-    <PackageReference Include="Hangfire" Version="1.7.8" />
-    <PackageReference Include="Hangfire.MemoryStorage" Version="1.6.1" />
+    <PackageReference Include="Correlate.DependencyInjection" Version="4.0.0" />
+    <PackageReference Include="Hangfire.MemoryStorage" Version="1.7.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="skwas.MockHttp" Version="2.2.0" />
   </ItemGroup>
@@ -24,16 +23,8 @@
     <PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.26" />
   </ItemGroup>
 
-  <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="1.1.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="1.1.2" />
-  </ItemGroup>
-
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Hangfire.Correlate\Hangfire.Correlate.csproj" AdditionalProperties="TargetFramework=netstandard2.0" Condition="'$(TargetFramework)'=='net6.0'" />
-    <ProjectReference Include="..\..\src\Hangfire.Correlate\Hangfire.Correlate.csproj" AdditionalProperties="TargetFramework=netstandard2.0" Condition="'$(TargetFramework)'=='netcoreapp3.1'" />
-    <ProjectReference Include="..\..\src\Hangfire.Correlate\Hangfire.Correlate.csproj" AdditionalProperties="TargetFramework=netstandard1.3" Condition="'$(TargetFramework)'=='net48'" />
-    <ProjectReference Include="..\..\src\Hangfire.Correlate\Hangfire.Correlate.csproj" AdditionalProperties="TargetFramework=net462" Condition="'$(TargetFramework)'=='net462'" />
+    <ProjectReference Include="..\..\src\Hangfire.Correlate\Hangfire.Correlate.csproj" />
   </ItemGroup>
 
 </Project>

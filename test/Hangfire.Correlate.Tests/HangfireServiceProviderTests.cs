@@ -1,5 +1,4 @@
-﻿#if NETCOREAPP
-using System;
+﻿using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Correlate;
@@ -40,7 +39,6 @@ namespace Hangfire.Correlate
 
 			// Below, dependencies for test only.
 
-#if NETCOREAPP3_1_OR_GREATER
 			// Register a typed client which is used by the job to call an endpoint.
 			// We use it to assert the request header contains the correlation id.
 			serviceCollection
@@ -50,26 +48,6 @@ namespace Hangfire.Correlate
 				})
 				.ConfigurePrimaryHttpMessageHandler(() => MockHttp)
 				.CorrelateRequests();
-#else
-			// HttpClientFactory is not supported below .NET Core 2.1.
-			// This service registration is somewhat similar to what the HttpClientFactory extension does.
-			serviceCollection.AddTransient(s =>
-			{
-				var correlatingHttpMessageHandler = new CorrelatingHttpMessageHandler(
-					s.GetRequiredService<ICorrelationContextAccessor>(),
-					Options.Create(new CorrelateClientOptions())
-				)
-				{
-					InnerHandler = MockHttp
-				};
-				return new TestService(
-					new HttpClient(correlatingHttpMessageHandler, true)
-					{
-						BaseAddress = new Uri("http://0.0.0.0")
-					}
-				);
-			});
-#endif
 
 			serviceCollection
 				.AddSingleton(ExecutedJobs)
@@ -98,4 +76,3 @@ namespace Hangfire.Correlate
 		}
 	}
 }
-#endif

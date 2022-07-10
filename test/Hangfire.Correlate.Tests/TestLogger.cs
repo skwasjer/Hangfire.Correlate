@@ -32,11 +32,7 @@ namespace Hangfire.Correlate
 
 		public IDisposable BeginScope<TState>(TState state)
 		{
-#if NETCOREAPP3_1_OR_GREATER
 			return NullLogger.Instance.BeginScope(state);
-#else
-			return Microsoft.Extensions.Logging.Abstractions.Internal.NullScope.Instance;
-#endif
 		}
 	}
 }
