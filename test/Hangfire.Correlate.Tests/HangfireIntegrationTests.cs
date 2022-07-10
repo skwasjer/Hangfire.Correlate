@@ -13,7 +13,8 @@ using CorrelationManager = Correlate.CorrelationManager;
 
 namespace Hangfire.Correlate;
 
-public abstract class HangfireIntegrationTests : IAsyncLifetime
+[Collection(nameof(GlobalTestContext))]
+public abstract class HangfireIntegrationTests : GlobalTestContext
 {
     private readonly ITestOutputHelper _testOutputHelper;
     private readonly CorrelationManager _correlationManager;
@@ -39,20 +40,22 @@ public abstract class HangfireIntegrationTests : IAsyncLifetime
         );
     }
 
-    public virtual Task InitializeAsync()
+    public override async Task InitializeAsync()
     {
+        await base.InitializeAsync();
+
         // We create server so that we can test that jobs are executed properly.
         _server = CreateServer();
         // We create client to enqueue new jobs.
         _client = CreateClient();
-        return Task.CompletedTask;
     }
 
-    public virtual Task DisposeAsync()
+    public override async Task DisposeAsync()
     {
+        await base.DisposeAsync();
+
         _server.Dispose();
         MockHttp.Dispose();
-        return Task.CompletedTask;
     }
 
     protected MockHttpHandler MockHttp { get; } = new();
@@ -113,6 +116,13 @@ public abstract class HangfireIntegrationTests : IAsyncLifetime
                 jobId = _client.Enqueue<BackgroundTestExecutor>(job => job.RunAsync(TimeoutInMillis, null!));
             });
 
+        while (true)
+        {
+            if (jobId is not null)
+            {
+                break;
+            }
+        }
         await WaitUntilJobCompletedAsync(jobId.Should().NotBeNull().And.Subject);
 
         // Assert

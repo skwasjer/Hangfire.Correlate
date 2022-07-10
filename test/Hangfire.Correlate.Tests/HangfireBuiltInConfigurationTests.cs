@@ -15,7 +15,6 @@ namespace Hangfire.Correlate;
 /// <remarks>
 /// Parallel test execution is not supported since we use memory storage with Hangfire that is being set into a static property Storage.Current. When tests are run in parallel, the test that last set the storage will win, while the others will break. This is also true for other Hangfire dependencies, but they do not directly affect our tests atm.
 /// </remarks>
-[Collection(nameof(HangfireIntegrationTests))]
 public class HangfireBuiltInConfigurationTests : HangfireIntegrationTests
 {
     private readonly LoggerFactory _loggerFactory;
