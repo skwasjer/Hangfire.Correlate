@@ -9,7 +9,7 @@
   <ItemGroup>
     <PackageReference Include="Correlate.DependencyInjection" Version="4.0.0" />
     <PackageReference Include="Hangfire.MemoryStorage" Version="1.7.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="skwas.MockHttp" Version="2.2.0" />
   </ItemGroup>
 
