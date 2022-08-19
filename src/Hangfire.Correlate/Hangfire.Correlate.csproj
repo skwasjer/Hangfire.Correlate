@@ -13,7 +13,7 @@
 
   <ItemGroup>
     <PackageReference Include="Correlate" Version="4.0.0" />
-    <PackageReference Include="Hangfire" Version="1.7.30" />
+    <PackageReference Include="Hangfire" Version="1.7.31" />
   </ItemGroup>
 
 </Project>
