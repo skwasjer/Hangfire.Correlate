@@ -6,7 +6,7 @@ using Hangfire.States;
 
 namespace Hangfire.Correlate;
 
-internal class CorrelateFilterAttribute
+internal sealed class CorrelateFilterAttribute
     : JobFilterAttribute,
       IClientFilter,
       IServerFilter
