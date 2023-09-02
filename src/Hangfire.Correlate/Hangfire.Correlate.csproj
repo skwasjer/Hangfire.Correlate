@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <IsTestProject>false</IsTestProject>
+    <NoWarn>$(NoWarn);CA1019</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup>
