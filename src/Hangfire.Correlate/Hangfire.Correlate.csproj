@@ -10,7 +10,12 @@
     <Description>Hangfire integration of Correlate to add correlation id support to Hangfire background/scheduled jobs.</Description>
     <PackageProjectUrl>https://github.com/skwasjer/Hangfire.Correlate</PackageProjectUrl>
     <PackageTags>hangfire, correlationid, correlation, correlate, causation</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Correlate" Version="4.0.0" />
