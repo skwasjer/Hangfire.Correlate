@@ -2,7 +2,7 @@
 using Hangfire.Common;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Moq;
+using NSubstitute;
 using Xunit;
 
 namespace Hangfire.Correlate;
@@ -10,19 +10,14 @@ namespace Hangfire.Correlate;
 [Collection(nameof(GlobalTestContext))]
 public abstract class GlobalConfigurationExtensionsTests : GlobalTestContext
 {
-    private readonly Mock<IGlobalConfiguration> _configMock;
-
-    protected GlobalConfigurationExtensionsTests()
-    {
-        _configMock = new Mock<IGlobalConfiguration>();
-    }
+    private readonly IGlobalConfiguration _configMock = Substitute.For<IGlobalConfiguration>();
 
     protected abstract void Use(IGlobalConfiguration configuration);
 
     [Fact]
     public void When_using_it_should_register_filter()
     {
-        Use(_configMock.Object);
+        Use(_configMock);
 
         GlobalJobFilters.Filters.Should()
             .Contain(f => f.Instance is CorrelateFilterAttribute)
@@ -49,8 +44,8 @@ public abstract class GlobalConfigurationExtensionsTests : GlobalTestContext
 
         public static IEnumerable<object?[]> NullArgTestCases()
         {
-            IGlobalConfiguration configuration = Mock.Of<IGlobalConfiguration>();
-            ILoggerFactory loggerFactory = Mock.Of<ILoggerFactory>();
+            IGlobalConfiguration configuration = Substitute.For<IGlobalConfiguration>();
+            ILoggerFactory loggerFactory = Substitute.For<ILoggerFactory>();
 
             yield return new object?[] { null, loggerFactory, nameof(configuration) };
             yield return new object?[] { configuration, null, nameof(loggerFactory) };
@@ -58,20 +53,15 @@ public abstract class GlobalConfigurationExtensionsTests : GlobalTestContext
 
         protected override void Use(IGlobalConfiguration configuration)
         {
-            configuration.UseCorrelate(Mock.Of<ILoggerFactory>());
+            configuration.UseCorrelate(Substitute.For<ILoggerFactory>());
         }
     }
 
     public class WithServiceProvider : GlobalConfigurationExtensionsTests
     {
-        private readonly ServiceProvider _services;
-
-        public WithServiceProvider()
-        {
-            _services = new ServiceCollection()
-                .AddLogging()
-                .BuildServiceProvider();
-        }
+        private readonly ServiceProvider _services = new ServiceCollection()
+            .AddLogging()
+            .BuildServiceProvider();
 
         public override async Task DisposeAsync()
         {
@@ -86,7 +76,7 @@ public abstract class GlobalConfigurationExtensionsTests : GlobalTestContext
             {
                 using ServiceProvider? services = new ServiceCollection()
                     .BuildServiceProvider();
-                _configMock.Object.UseCorrelate(services);
+                _configMock.UseCorrelate(services);
             };
 
             // Assert
@@ -113,8 +103,8 @@ public abstract class GlobalConfigurationExtensionsTests : GlobalTestContext
 
         public static IEnumerable<object?[]> NullArgTestCases()
         {
-            IGlobalConfiguration configuration = Mock.Of<IGlobalConfiguration>();
-            IServiceProvider serviceProvider = Mock.Of<IServiceProvider>();
+            IGlobalConfiguration configuration = Substitute.For<IGlobalConfiguration>();
+            IServiceProvider serviceProvider = Substitute.For<IServiceProvider>();
 
             yield return new object?[] { null, serviceProvider, nameof(configuration) };
             yield return new object?[] { configuration, null, nameof(serviceProvider) };
@@ -122,7 +112,7 @@ public abstract class GlobalConfigurationExtensionsTests : GlobalTestContext
 
         protected override void Use(IGlobalConfiguration configuration)
         {
-            configuration.UseCorrelate(Mock.Of<ILoggerFactory>());
+            configuration.UseCorrelate(Substitute.For<ILoggerFactory>());
         }
     }
 }
