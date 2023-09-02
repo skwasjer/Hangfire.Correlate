@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
@@ -14,7 +14,7 @@
 
   <ItemGroup>
     <PackageReference Include="Correlate" Version="4.0.0" />
-    <PackageReference Include="Hangfire" Version="1.7.36" />
+    <PackageReference Include="Hangfire" Version="1.8.5" />
   </ItemGroup>
 
 </Project>
