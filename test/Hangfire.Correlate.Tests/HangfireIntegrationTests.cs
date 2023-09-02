@@ -71,13 +71,14 @@ public abstract class HangfireIntegrationTests : GlobalTestContext
         IMonitoringApi monitoringApi = JobStorage.Current.GetMonitoringApi();
 
         var sw = Stopwatch.StartNew();
-        JobDetailsDto? jobDetails = null;
+        StateHistoryDto[] jobHistory = Array.Empty<StateHistoryDto>();
         while (
-            (jobDetails is null || jobDetails.History.All(s => s.StateName != "Succeeded"))
+            (jobHistory.All(s => s.StateName != "Succeeded"))
          && (sw.Elapsed.TotalMilliseconds < maxWaitInMilliseconds || Debugger.IsAttached))
         {
             await Task.Delay(25);
-            jobDetails = monitoringApi.JobDetails(jobId);
+            JobDetailsDto jobDetails = monitoringApi.JobDetails(jobId);
+            jobHistory = jobDetails.History.ToArray();
             if (monitoringApi.FailedCount() > 0)
             {
                 break;
