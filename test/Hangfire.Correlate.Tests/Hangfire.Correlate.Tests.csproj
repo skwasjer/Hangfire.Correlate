@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Correlate.DependencyInjection" Version="5.1.0" />
-    <PackageReference Include="Hangfire.MemoryStorage" Version="1.8.0" />
+    <PackageReference Include="Hangfire.MemoryStorage" Version="1.8.1.1" />
     <PackageReference Include="skwas.MockHttp" Version="4.5.0" />
   </ItemGroup>
 
