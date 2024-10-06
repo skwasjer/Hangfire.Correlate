@@ -1,9 +1,6 @@
-﻿using FluentAssertions;
-using Hangfire.Common;
+﻿using Hangfire.Common;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using NSubstitute;
-using Xunit;
 
 namespace Hangfire.Correlate;
 
@@ -21,15 +18,16 @@ public abstract class GlobalConfigurationExtensionsTests : GlobalTestContext
 
         GlobalJobFilters.Filters.Should()
             .Contain(f => f.Instance is CorrelateFilterAttribute)
-            .Which.Scope.Should().Be(JobFilterScope.Global);
+            .Which.Scope.Should()
+            .Be(JobFilterScope.Global);
     }
 
+    [Obsolete("To be removed in next major release.")]
     public class WithLoggerFactory : GlobalConfigurationExtensionsTests
     {
         [Theory]
         [MemberData(nameof(NullArgTestCases))]
-        public void Given_that_required_arg_is_null_when_using_it_should_throw
-        (
+        public void Given_that_required_arg_is_null_when_using_it_should_throw(
             IGlobalConfiguration configuration,
             ILoggerFactory loggerFactory,
             string expectedParamName
@@ -47,8 +45,14 @@ public abstract class GlobalConfigurationExtensionsTests : GlobalTestContext
             IGlobalConfiguration configuration = Substitute.For<IGlobalConfiguration>();
             ILoggerFactory loggerFactory = Substitute.For<ILoggerFactory>();
 
-            yield return new object?[] { null, loggerFactory, nameof(configuration) };
-            yield return new object?[] { configuration, null, nameof(loggerFactory) };
+            yield return new object?[]
+            {
+                null, loggerFactory, nameof(configuration)
+            };
+            yield return new object?[]
+            {
+                configuration, null, nameof(loggerFactory)
+            };
         }
 
         protected override void Use(IGlobalConfiguration configuration)
@@ -87,8 +91,7 @@ public abstract class GlobalConfigurationExtensionsTests : GlobalTestContext
 
         [Theory]
         [MemberData(nameof(NullArgTestCases))]
-        public void Given_that_required_arg_is_null_when_using_it_should_throw
-        (
+        public void Given_that_required_arg_is_null_when_using_it_should_throw(
             IGlobalConfiguration configuration,
             IServiceProvider serviceProvider,
             string expectedParamName
@@ -106,8 +109,14 @@ public abstract class GlobalConfigurationExtensionsTests : GlobalTestContext
             IGlobalConfiguration configuration = Substitute.For<IGlobalConfiguration>();
             IServiceProvider serviceProvider = Substitute.For<IServiceProvider>();
 
-            yield return new object?[] { null, serviceProvider, nameof(configuration) };
-            yield return new object?[] { configuration, null, nameof(serviceProvider) };
+            yield return new object?[]
+            {
+                null, serviceProvider, nameof(configuration)
+            };
+            yield return new object?[]
+            {
+                configuration, null, nameof(serviceProvider)
+            };
         }
 
         protected override void Use(IGlobalConfiguration configuration)
