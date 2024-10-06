@@ -32,7 +32,10 @@ public static class GlobalConfigurationExtensions
         }
         catch (InvalidOperationException ex)
         {
-            throw new InvalidOperationException("Failed to register Correlate with Hangfire. Please ensure `.AddCorrelate()` is called on the service collection.", ex);
+            throw new InvalidOperationException(
+                "Failed to register Correlate with Hangfire. Please ensure `.AddCorrelate()` is called on the service collection.",
+                ex
+            );
         }
     }
 
@@ -41,6 +44,7 @@ public static class GlobalConfigurationExtensions
     /// </summary>
     /// <param name="configuration">The global configuration.</param>
     /// <param name="loggerFactory">The logger factory.</param>
+    [Obsolete("Use the overload accepting an IServiceProvider.")]
     public static IGlobalConfiguration UseCorrelate(this IGlobalConfiguration configuration, ILoggerFactory loggerFactory)
     {
         if (configuration is null)
