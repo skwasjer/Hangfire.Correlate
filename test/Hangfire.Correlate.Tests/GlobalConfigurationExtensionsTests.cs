@@ -1,4 +1,5 @@
-﻿using Hangfire.Common;
+﻿using Correlate;
+using Hangfire.Common;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -14,6 +15,9 @@ public abstract class GlobalConfigurationExtensionsTests : GlobalTestContext
     [Fact]
     public void When_using_it_should_register_filter()
     {
+        GlobalJobFilters.Filters.Should()
+            .NotContain(f => f.Instance is CorrelateFilterAttribute);
+
         Use(_configMock);
 
         GlobalJobFilters.Filters.Should()
@@ -121,7 +125,14 @@ public abstract class GlobalConfigurationExtensionsTests : GlobalTestContext
 
         protected override void Use(IGlobalConfiguration configuration)
         {
-            configuration.UseCorrelate(Substitute.For<ILoggerFactory>());
+            IServiceProvider serviceProviderMock = Substitute.For<IServiceProvider>();
+            serviceProviderMock
+                .GetService(typeof(ICorrelationContextAccessor))
+                .Returns(Substitute.For<ICorrelationContextAccessor>());
+            serviceProviderMock
+                .GetService(typeof(IActivityFactory))
+                .Returns(Substitute.For<IActivityFactory>());
+            configuration.UseCorrelate(serviceProviderMock);
         }
     }
 }
