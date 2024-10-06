@@ -2,12 +2,11 @@
 using System.Net;
 using Correlate;
 using Correlate.Http;
-using FluentAssertions;
 using Hangfire.Server;
 using Hangfire.Storage;
 using Hangfire.Storage.Monitoring;
+using Microsoft.Extensions.Logging.Testing;
 using MockHttp;
-using Xunit;
 using Xunit.Abstractions;
 using CorrelationManager = Correlate.CorrelationManager;
 
@@ -36,7 +35,7 @@ public abstract class HangfireIntegrationTests : GlobalTestContext
             new CorrelationContextFactory(correlationContextAccessor),
             new GuidCorrelationIdFactory(),
             correlationContextAccessor,
-            new TestLogger<CorrelationManager>()
+            new FakeLogger<CorrelationManager>()
         );
     }
 
