@@ -1,7 +1,4 @@
-﻿using Hangfire.Common;
-using Xunit;
-
-namespace Hangfire.Correlate;
+﻿namespace Hangfire.Correlate;
 
 /// <summary>
 /// Marker to disable parallel tests because when registering Hangfire filters, it adds it to a static list.
@@ -24,9 +21,9 @@ public abstract class GlobalTestContext : IAsyncLifetime
     private static void CleanUpFilters()
     {
         foreach (object? filter in GlobalJobFilters.Filters
-                     .Where(f => f.Instance is CorrelateFilterAttribute)
-                     .Select(f => f.Instance)
-                     .ToArray())
+            .Where(f => f.Instance is CorrelateFilterAttribute)
+            .Select(f => f.Instance)
+            .ToArray())
         {
             GlobalJobFilters.Filters.Remove(filter);
         }
