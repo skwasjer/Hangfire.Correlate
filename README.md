@@ -44,22 +44,9 @@ A continuation job will inherit the correlation id from the parent job, unless e
 
 Configure Hangfire to use Correlate.
 
-### Using built-in configuration extensions ###
-
-Use the Hangfire built-in configuration extensions to enable Correlate.
-
-```csharp
-ILoggerFactory loggerFactory = new LoggerFactory();
-loggerFactory.AddConsole();
-
-GlobalConfiguration.Configuration
-    .UseCorrelate(loggerFactory)
-    .(...);
-```
-
 ### Using a `IServiceProvider`
 
-Alternatively (but recommended), use `IServiceProvider` to configure Hangfire with Correlate.
+Use the configuration extension with `IServiceProvider` to configure Hangfire with Correlate.
 
 Add package dependencies:
 - [Correlate.DependencyInjection](https://github.com/skwasjer/Correlate)
@@ -72,6 +59,21 @@ services
         .UseCorrelate(serviceProvider)
         .(...)
     );
+```
+
+### Using built-in configuration extensions ###
+
+Use the Hangfire built-in configuration extensions to enable Correlate.
+
+> This is no longer the recommended approach and will most likely be removed in a future version.
+
+```csharp
+ILoggerFactory loggerFactory = new LoggerFactory();
+loggerFactory.AddConsole();
+
+GlobalConfiguration.Configuration
+    .UseCorrelate(loggerFactory)
+    .(...);
 ```
 
 ## Enqueue jobs
