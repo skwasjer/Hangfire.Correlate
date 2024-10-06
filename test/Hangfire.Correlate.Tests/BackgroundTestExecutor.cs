@@ -14,7 +14,12 @@ public class BackgroundTestExecutor
     {
     }
 
-    public BackgroundTestExecutor(TestService testService, ICorrelationContextAccessor correlationContextAccessor, ICollection<object> jobState, ITestOutputHelper testOutputHelper)
+    public BackgroundTestExecutor(
+        TestService testService,
+        ICorrelationContextAccessor correlationContextAccessor,
+        ICollection<object> jobState,
+        ITestOutputHelper testOutputHelper
+    )
     {
         _testService = testService ?? throw new ArgumentNullException(nameof(testService));
         _correlationContextAccessor = correlationContextAccessor ?? throw new ArgumentNullException(nameof(correlationContextAccessor));

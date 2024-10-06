@@ -7,10 +7,13 @@ using Xunit.Abstractions;
 namespace Hangfire.Correlate;
 
 /// <summary>
-/// Tests Hangfire integration with the <see cref="GlobalConfigurationExtensions.UseCorrelate(IGlobalConfiguration,IServiceProvider)" /> overload.
+/// Tests Hangfire integration with the <see cref="GlobalConfigurationExtensions.UseCorrelate(IGlobalConfiguration,IServiceProvider)" />
+/// overload.
 /// </summary>
 /// <remarks>
-/// Parallel test execution is not supported since we use memory storage with Hangfire that is being set into a static property Storage.Current. When tests are run in parallel, the test that last set the storage will win, while the others will break. This is also true for other Hangfire dependencies, but they do not directly affect our tests atm.
+/// Parallel test execution is not supported since we use memory storage with Hangfire that is being set into a static property
+/// Storage.Current. When tests are run in parallel, the test that last set the storage will win, while the others will break. This is also
+/// true for other Hangfire dependencies, but they do not directly affect our tests atm.
 /// </remarks>
 public class HangfireServiceProviderTests : HangfireIntegrationTests
 {
@@ -22,22 +25,26 @@ public class HangfireServiceProviderTests : HangfireIntegrationTests
         IServiceCollection serviceCollection = new ServiceCollection();
         serviceCollection
             .AddCorrelate()
-            .AddHangfire((s, config) =>
-            {
-                config
-                    .UseCorrelate(s)
-                    .UseMemoryStorage();
-            });
+            .AddHangfire(
+                (s, config) =>
+                {
+                    config
+                        .UseCorrelate(s)
+                        .UseMemoryStorage();
+                }
+            );
 
         // Below, dependencies for test only.
 
         // Register a typed client which is used by the job to call an endpoint.
         // We use it to assert the request header contains the correlation id.
         serviceCollection
-            .AddHttpClient<TestService>(client =>
-            {
-                client.BaseAddress = new Uri("http://0.0.0.0");
-            })
+            .AddHttpClient<TestService>(
+                client =>
+                {
+                    client.BaseAddress = new Uri("http://0.0.0.0");
+                }
+            )
             .ConfigurePrimaryHttpMessageHandler(() => MockHttp)
             .CorrelateRequests();
 

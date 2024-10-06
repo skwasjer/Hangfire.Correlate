@@ -78,7 +78,7 @@ public abstract class GlobalConfigurationExtensionsTests : GlobalTestContext
         {
             Action act = () =>
             {
-                using ServiceProvider? services = new ServiceCollection()
+                using ServiceProvider services = new ServiceCollection()
                     .BuildServiceProvider();
                 _configMock.UseCorrelate(services);
             };
