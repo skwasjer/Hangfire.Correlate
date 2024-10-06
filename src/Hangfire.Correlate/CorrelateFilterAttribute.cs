@@ -6,7 +6,9 @@ using Hangfire.States;
 
 namespace Hangfire.Correlate;
 
+#pragma warning disable S3993 // Custom attributes should be marked with "System.AttributeUsageAttribute"
 internal sealed class CorrelateFilterAttribute
+#pragma warning restore S3993 // Custom attributes should be marked with "System.AttributeUsageAttribute"
     : JobFilterAttribute,
       IClientFilter,
       IServerFilter
@@ -59,7 +61,7 @@ internal sealed class CorrelateFilterAttribute
     public void OnPerformed(PerformedContext filterContext)
     {
         if (filterContext.Items.TryGetValue(CorrelateActivityKey, out object? objActivity)
-         && objActivity is IActivity activity)
+            && objActivity is IActivity activity)
         {
             activity.Stop();
         }
@@ -75,7 +77,8 @@ internal sealed class CorrelateFilterAttribute
             return null;
         }
 
-        string parentCorrelationId = SerializationHelper.Deserialize<string>(filterContext.Connection.GetJobParameter(awaitingState.ParentId, CorrelationIdKey));
+        string parentCorrelationId =
+            SerializationHelper.Deserialize<string>(filterContext.Connection.GetJobParameter(awaitingState.ParentId, CorrelationIdKey));
         return string.IsNullOrEmpty(parentCorrelationId)
             ? awaitingState.ParentId
             : parentCorrelationId;
