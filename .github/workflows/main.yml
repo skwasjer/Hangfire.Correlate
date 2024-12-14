@@ -12,6 +12,7 @@ env:
   DOTNET_CLI_TELEMETRY_OPTOUT: true
   DOTNET_NOLOGO: true
   dotnet-version: |
+    8.0.x
     6.0.x
 
 jobs:
