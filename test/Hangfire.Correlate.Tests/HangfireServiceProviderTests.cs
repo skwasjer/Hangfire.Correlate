@@ -1,5 +1,4 @@
 ﻿using Correlate.DependencyInjection;
-using Hangfire.MemoryStorage;
 using Hangfire.Server;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit.Abstractions;
@@ -30,7 +29,7 @@ public class HangfireServiceProviderTests : HangfireIntegrationTests
                 {
                     config
                         .UseCorrelate(s)
-                        .UseMemoryStorage();
+                        .UseInMemoryStorage();
                 }
             );
 
