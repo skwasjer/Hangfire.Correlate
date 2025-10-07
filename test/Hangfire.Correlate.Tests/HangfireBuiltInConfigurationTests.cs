@@ -1,6 +1,5 @@
 ﻿using Correlate;
 using Correlate.Http;
-using Hangfire.MemoryStorage;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -39,7 +38,7 @@ public class HangfireBuiltInConfigurationTests : HangfireIntegrationTests
                         )
                 )
             )
-            .UseMemoryStorage();
+            .UseInMemoryStorage();
     }
 
     private TestService CreateTestService()
