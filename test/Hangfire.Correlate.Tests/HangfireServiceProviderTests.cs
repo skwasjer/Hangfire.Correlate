@@ -1,4 +1,5 @@
 ﻿using Correlate.DependencyInjection;
+using Hangfire.Logging;
 using Hangfire.Server;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit.Abstractions;
@@ -29,6 +30,7 @@ public class HangfireServiceProviderTests : HangfireIntegrationTests
                 {
                     config
                         .UseCorrelate(s)
+                        .UseLogProvider(Substitute.For<ILogProvider>())
                         .UseInMemoryStorage();
                 }
             );

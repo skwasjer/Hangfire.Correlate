@@ -1,5 +1,6 @@
 ﻿using Correlate;
 using Correlate.Http;
+using Hangfire.Logging;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -27,6 +28,7 @@ public class HangfireBuiltInConfigurationTests : HangfireIntegrationTests
 
         GlobalConfiguration.Configuration
             .UseCorrelate(_loggerFactory)
+            .UseLogProvider(Substitute.For<ILogProvider>())
             .UseActivator(
                 new BackgroundTestExecutorJobActivator(
                     () =>
