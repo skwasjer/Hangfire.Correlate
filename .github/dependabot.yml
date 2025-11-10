@@ -12,6 +12,10 @@ updates:
     target-branch: "main"
     commit-message:
       prefix: "chore(deps)"
+    groups:
+      correlate:
+        patterns:
+          - Correlate*
 
   - package-ecosystem: "github-actions"
     directory: "/"
