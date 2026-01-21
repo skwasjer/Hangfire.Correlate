@@ -96,7 +96,7 @@ jobs:
         os:
           - ubuntu-latest
           - windows-latest
-          - macos-13
+          - macos-latest
       fail-fast: false
     runs-on: ${{ matrix.os }}
     steps:
@@ -161,7 +161,7 @@ jobs:
         with:
           name: release-${{ needs.determine-version.outputs.package-version }}
           path: |
-            **/*.*nupkg
+            ./src/**/*.*nupkg
           if-no-files-found: error
           retention-days: 90
 
@@ -184,4 +184,4 @@ jobs:
         env:
           NUGET_SOURCE_URL: https://api.nuget.org/v3/index.json
           NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
-        run: dotnet nuget push **/*.nupkg -k $NUGET_API_KEY -s "$NUGET_SOURCE_URL"
+        run: dotnet nuget push ./**/*.nupkg -k $NUGET_API_KEY -s "$NUGET_SOURCE_URL"
