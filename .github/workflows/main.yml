@@ -34,12 +34,12 @@ jobs:
           fetch-tags: true
 
       - name: Install GitVersion ${{ env.GITVERSION }}
-        uses: gittools/actions/gitversion/setup@d0139503a9321f76b4a417dfdc8aebcec24decdd #v4.2.0
+        uses: gittools/actions/gitversion/setup@e0d584e657c606912e8fd522aeed29025975705f #v4.4.2
         with:
           versionSpec: ${{ env.GITVERSION }}
 
       - name: Determine version
-        uses: gittools/actions/gitversion/execute@d0139503a9321f76b4a417dfdc8aebcec24decdd #v4.2.0
+        uses: gittools/actions/gitversion/execute@e0d584e657c606912e8fd522aeed29025975705f #v4.4.2
         id: gitversion
 
   build:
