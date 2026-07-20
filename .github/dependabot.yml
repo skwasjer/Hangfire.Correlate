@@ -24,3 +24,7 @@ updates:
     target-branch: "main"
     commit-message:
       prefix: "ci(deps)"
+    groups:
+      git-tools:
+        patterns:
+          - gittools/actions/*
